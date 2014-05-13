@@ -12,6 +12,12 @@ DEB_DH_AUTORECONF_ARGS += --as-needed
 # make autoreconf not call autopoint since we ship a patch for po/Makefile.in.in
 export AUTOPOINT=true
 
+export PATH := /opt/gstreamer1.4/bin:$(PATH)
+export PKG_CONFIG_PATH=/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/pkgconfig
+GST_LD_LIBRARY_PATH=LD_LIBRARY_PATH=/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)
+DEB_MAKE_ENVVARS += $(GST_LD_LIBRARY_PATH)
+DEB_SHLIBDEPS_INCLUDE += /opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)
+
 CFLAGS += -Wno-error
 CXXFLAGS += -Wno-error
 LDFLAGS += -Wl,-z,defs -Wl,-O1 -Wl,--as-needed
@@ -65,7 +71,7 @@ gst_extra_build_depends += , libsbc-dev (>= 1.1) [linux-any]
 # The plugins are basically the same.
 # Link special names to a template file.
 # still need "*.install" to be done by hand
-# 
+#
 # EXTRA_PLUGINS: See debian/README.Debian for docs
 EXTRA_PLUGINS +=
 
@@ -209,7 +215,7 @@ DEB_CONFIGURE_EXTRA_FLAGS += --enable-gtk-doc
 endif
 
 common-binary-fixup-arch::
-	LD_LIBRARY_PATH=debian/libgstreamer-plugins-bad1.0-0/usr/lib/$(DEB_HOST_MULTIARCH):$(LD_LIBRARY_PATH) \
+	LD_LIBRARY_PATH=debian/libgstreamer-plugins-bad1.0-0/usr/lib/$(DEB_HOST_MULTIARCH):/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH):$(LD_LIBRARY_PATH) \
 		dh_gstscancodecs
 
 clean::
