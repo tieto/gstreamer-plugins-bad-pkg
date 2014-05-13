@@ -38,7 +38,9 @@ static GstStaticPadTemplate gst_gl_filter_src_pad_template =
     GST_STATIC_PAD_TEMPLATE ("src",
     GST_PAD_SRC,
     GST_PAD_ALWAYS,
-    GST_STATIC_CAPS (
+    GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE_WITH_FEATURES
+        (GST_CAPS_FEATURE_MEMORY_GL_MEMORY,
+            "RGBA") "; "
 #if GST_GL_HAVE_PLATFORM_EGL
         GST_VIDEO_CAPS_MAKE_WITH_FEATURES (GST_CAPS_FEATURE_MEMORY_EGL_IMAGE,
             "RGBA") "; "
@@ -52,7 +54,9 @@ static GstStaticPadTemplate gst_gl_filter_sink_pad_template =
     GST_STATIC_PAD_TEMPLATE ("sink",
     GST_PAD_SINK,
     GST_PAD_ALWAYS,
-    GST_STATIC_CAPS (
+    GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE_WITH_FEATURES
+        (GST_CAPS_FEATURE_MEMORY_GL_MEMORY,
+            "RGBA") "; "
 #if GST_GL_HAVE_PLATFORM_EGL
         GST_VIDEO_CAPS_MAKE_WITH_FEATURES (GST_CAPS_FEATURE_MEMORY_EGL_IMAGE,
             "RGBA") "; "
@@ -742,7 +746,7 @@ gst_gl_filter_propose_allocation (GstBaseTransform * trans,
   GstGLFilter *filter = GST_GL_FILTER (trans);
   GstBufferPool *pool;
   GstStructure *config;
-  GstCaps *caps;
+  GstCaps *caps, *decide_caps;
   guint size;
   gboolean need_pool;
   GError *error = NULL;
@@ -788,20 +792,28 @@ gst_gl_filter_propose_allocation (GstBaseTransform * trans,
 
   if (pool == NULL && need_pool) {
     GstVideoInfo info;
+    GstBufferPool *decide_pool;
 
     if (!gst_video_info_from_caps (&info, caps))
       goto invalid_caps;
 
-    GST_DEBUG_OBJECT (filter, "create new pool");
-    pool = gst_gl_buffer_pool_new (filter->context);
+    gst_query_parse_allocation (decide_query, &decide_caps, NULL);
+    decide_pool = gst_base_transform_get_buffer_pool (trans);
+    if (gst_caps_is_equal_fixed (decide_caps, caps)) {
+      pool = decide_pool;
+    } else {
+      GST_DEBUG_OBJECT (filter, "create new pool");
+      gst_object_unref (decide_pool);
+      pool = gst_gl_buffer_pool_new (filter->context);
 
-    /* the normal size of a frame */
-    size = info.size;
+      /* the normal size of a frame */
+      size = info.size;
 
-    config = gst_buffer_pool_get_config (pool);
-    gst_buffer_pool_config_set_params (config, caps, size, 0, 0);
-    if (!gst_buffer_pool_set_config (pool, config))
-      goto config_failed;
+      config = gst_buffer_pool_get_config (pool);
+      gst_buffer_pool_config_set_params (config, caps, size, 0, 0);
+      if (!gst_buffer_pool_set_config (pool, config))
+        goto config_failed;
+    }
   }
   /* we need at least 2 buffer because we hold on to the last one */
   if (pool) {
@@ -1123,9 +1135,8 @@ gst_gl_filter_transform (GstBaseTransform * bt, GstBuffer * inbuf,
       filter->upload = gst_object_ref (GST_GL_BUFFER_POOL (pool)->upload);
     } else {
       filter->upload = gst_gl_upload_new (filter->context);
-      if (!gst_gl_upload_init_format (filter->upload, &filter->in_info))
-        goto upload_error;
     }
+    gst_gl_upload_set_format (filter->upload, &filter->in_info);
 
     gst_caps_unref (in_caps);
     gst_caps_unref (out_caps);
@@ -1140,15 +1151,6 @@ gst_gl_filter_transform (GstBaseTransform * bt, GstBuffer * inbuf,
     gst_gl_filter_filter_texture (filter, inbuf, outbuf);
 
   return GST_FLOW_OK;
-
-upload_error:
-  {
-    GST_ELEMENT_ERROR (filter, RESOURCE, NOT_FOUND, ("Failed to init upload"),
-        (NULL));
-    gst_object_unref (filter->upload);
-    filter->upload = NULL;
-    return GST_FLOW_ERROR;
-  }
 }
 
 /* convenience functions to simplify filter development */
