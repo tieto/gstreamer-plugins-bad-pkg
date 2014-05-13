@@ -151,7 +151,9 @@ static GstStaticPadTemplate gst_glimage_sink_template =
     GST_STATIC_PAD_TEMPLATE ("sink",
     GST_PAD_SINK,
     GST_PAD_ALWAYS,
-    GST_STATIC_CAPS (
+    GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE_WITH_FEATURES
+        (GST_CAPS_FEATURE_MEMORY_GL_MEMORY,
+            "RGBA") "; "
 #if GST_GL_HAVE_PLATFORM_EGL
         GST_VIDEO_CAPS_MAKE_WITH_FEATURES
         (GST_CAPS_FEATURE_MEMORY_EGL_IMAGE, "RGBA") "; "
@@ -687,7 +689,11 @@ gst_glimage_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
     gst_object_unref (oldpool);
   }
 
+  if (glimage_sink->upload)
+    gst_object_unref (glimage_sink->upload);
   glimage_sink->upload = gst_object_ref (GST_GL_BUFFER_POOL (newpool)->upload);
+
+  gst_gl_upload_set_format (glimage_sink->upload, &vinfo);
 
   return TRUE;
 }

@@ -533,19 +533,25 @@ enum
 static GstStaticPadTemplate src_factory = GST_STATIC_PAD_TEMPLATE ("src",
     GST_PAD_SRC,
     GST_PAD_ALWAYS,
-    GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE (GST_GL_COLOR_CONVERT_FORMATS) "; "
+    GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE_WITH_FEATURES
+        (GST_CAPS_FEATURE_MEMORY_GL_MEMORY,
+            "RGBA") "; "
         GST_VIDEO_CAPS_MAKE_WITH_FEATURES
         (GST_CAPS_FEATURE_META_GST_VIDEO_GL_TEXTURE_UPLOAD_META,
-            "RGBA"))
+            "RGBA")
+        "; " GST_VIDEO_CAPS_MAKE (GST_GL_COLOR_CONVERT_FORMATS))
     );
 
 static GstStaticPadTemplate sink_factory = GST_STATIC_PAD_TEMPLATE ("sink_%d",
     GST_PAD_SINK,
     GST_PAD_REQUEST,
-    GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE (GST_GL_COLOR_CONVERT_FORMATS) "; "
+    GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE_WITH_FEATURES
+        (GST_CAPS_FEATURE_MEMORY_GL_MEMORY,
+            "RGBA") "; "
         GST_VIDEO_CAPS_MAKE_WITH_FEATURES
         (GST_CAPS_FEATURE_META_GST_VIDEO_GL_TEXTURE_UPLOAD_META,
-            "RGBA"))
+            "RGBA")
+        "; " GST_VIDEO_CAPS_MAKE (GST_GL_COLOR_CONVERT_FORMATS))
     );
 
 static gboolean gst_gl_mixer_src_query (GstPad * pad, GstObject * object,
@@ -1679,12 +1685,7 @@ gst_gl_mixer_process_textures (GstGLMixer * mix, GstBuffer * outbuf)
       if (!pad->upload) {
         pad->upload = gst_gl_upload_new (mix->context);
 
-        if (!gst_gl_upload_init_format (pad->upload, &pad->in_info)) {
-          GST_ELEMENT_ERROR (mix, RESOURCE, NOT_FOUND, ("%s",
-                  "Failed to init upload format"), (NULL));
-          res = FALSE;
-          goto out;
-        }
+        gst_gl_upload_set_format (pad->upload, &pad->in_info);
       }
 
       if (!gst_gl_upload_perform_with_buffer (pad->upload, mixcol->buffer,

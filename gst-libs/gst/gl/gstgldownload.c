@@ -67,7 +67,7 @@ GST_DEBUG_CATEGORY_STATIC (gst_gl_download_debug);
 #define DEBUG_INIT \
   GST_DEBUG_CATEGORY_INIT (gst_gl_download_debug, "gldownload", 0, "download");
 
-G_DEFINE_TYPE_WITH_CODE (GstGLDownload, gst_gl_download, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (GstGLDownload, gst_gl_download, GST_TYPE_OBJECT,
     DEBUG_INIT);
 static void gst_gl_download_finalize (GObject * object);
 
@@ -338,11 +338,8 @@ _init_download (GstGLContext * context, GstGLDownload * download)
   gst_video_info_set_format (&in_info, GST_VIDEO_FORMAT_RGBA, out_width,
       out_height);
 
-  download->priv->result =
-      gst_gl_color_convert_init_format (download->convert, &in_info,
+  gst_gl_color_convert_set_format (download->convert, &in_info,
       &download->info);
-  if (!download->priv->result)
-    return;
 
   download->priv->result = TRUE;
 }
