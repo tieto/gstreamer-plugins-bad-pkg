@@ -87,28 +87,28 @@ DEB_DH_STRIP_ARGS := --dbg-package=$(gst_pkgname)-plugins-bad-dbg
 
 # enable the real plugin on x86
 ifeq ($(DEB_HOST_ARCH_CPU), i386)
-real = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-$(gst_abi)/libgstreal.so
+real = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-$(gst_abi)/libgstreal.so
 endif
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
-dvb = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstdvb.so
-fbdev = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstfbdevsink.so
-vcd = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstvcdsrc.so
-cdaudio = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstcdaudio.so
-dc1394 = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstdc1394.so
-decklink = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstdecklink.so
-linsys = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstlinsys.so
-uvch264 = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstuvch264.so
-bluez = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstbluez.so
-sbc = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstsbc.so
+dvb = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstdvb.so
+fbdev = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstfbdevsink.so
+vcd = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstvcdsrc.so
+cdaudio = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstcdaudio.so
+dc1394 = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstdc1394.so
+decklink = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstdecklink.so
+linsys = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstlinsys.so
+uvch264 = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstuvch264.so
+bluez = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstbluez.so
+sbc = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstsbc.so
 endif
 
 ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
-cdaudio = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-$(gst_abi)/libgstcdaudio.so
+cdaudio = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-$(gst_abi)/libgstcdaudio.so
 endif
 
 ifneq ($(DEB_HOST_ARCH_OS),hurd)
-resindvd = debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstresindvd.so
+resindvd = debian/tmp/opt/gstreamer1.4/lib/$(DEB_HOST_MULTIARCH)/gstreamer-1.0/libgstresindvd.so
 endif
 
 # Let's decide the package name and url depending on the distribution
@@ -200,6 +200,7 @@ debian/control:: debian/control.in debian/build-deps debian/mk.control debian/ru
 
 
 DEB_CONFIGURE_EXTRA_FLAGS += \
+	--prefix=/opt/gstreamer1.4 \
 	--libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
 	--disable-examples \
 	--enable-DEBUG \

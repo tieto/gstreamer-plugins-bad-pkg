@@ -1,7 +1,7 @@
-debian/tmp/usr/lib/*/libgstphotography-@GST_ABI@.so.*
-debian/tmp/usr/lib/*/libgstbasecamerabinsrc-@GST_ABI@.so.*
-debian/tmp/usr/lib/*/libgstgl-@GST_ABI@.so.*
-debian/tmp/usr/lib/*/libgstinsertbin-@GST_ABI@.so.*
-debian/tmp/usr/lib/*/libgstcodecparsers-@GST_ABI@.so.*
-debian/tmp/usr/lib/*/libgstmpegts-@GST_ABI@.so.*
-debian/tmp/usr/lib/*/libgsturidownloader-@GST_ABI@.so.*
+debian/tmp/opt/gstreamer1.4/lib/*/libgstphotography-@GST_ABI@.so.*
+debian/tmp/opt/gstreamer1.4/lib/*/libgstbasecamerabinsrc-@GST_ABI@.so.*
+debian/tmp/opt/gstreamer1.4/lib/*/libgstgl-@GST_ABI@.so.*
+debian/tmp/opt/gstreamer1.4/lib/*/libgstinsertbin-@GST_ABI@.so.*
+debian/tmp/opt/gstreamer1.4/lib/*/libgstcodecparsers-@GST_ABI@.so.*
+debian/tmp/opt/gstreamer1.4/lib/*/libgstmpegts-@GST_ABI@.so.*
+debian/tmp/opt/gstreamer1.4/lib/*/libgsturidownloader-@GST_ABI@.so.*
